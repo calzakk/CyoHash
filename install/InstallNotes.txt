@@ -1,0 +1,18 @@
+---CyoHash 2.2.0
+
+Thank you for downloading CyoHash!
+
+Version 2 introduces a new window that contains a list of files being hashed; hashing multiple files no longer opens a new window for each file.
+
+I'd be extremely grateful for any feedback on the change, whether good or bad!
+
+--Installation
+Please close all open Windows Explorer instances before proceeding, otherwise you'll probably need to reboot (Windows XP users will unfortunately need to reboot regardless).
+
+--Usage
+CyoHash usage is unchanged; simply right-click a file (or files) in Windows Explorer, select CyoHash, then select the algorithm. That's it!
+Right-click within the list to display a context menu; this can be used for pausing, resuming, or cancelling a hashing operation.
+Double-click a hashed file in the list to bring up the original dialog, into which a hash can be pasted to provide simple hash validation.
+
+--Support
+For help, bug reports, or feature requests, please visit the project page at [https://github.com/calzakk/CyoHash].

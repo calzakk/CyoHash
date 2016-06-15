@@ -1,0 +1,8 @@
+
+Manually resize the columns and save/restore their widths.
+
+Custom drawn items (so ellipsis (...) can be used for pathnames).
+
+Highlight, or colour, files with different paths that have the same hash value.
+
+CyoHashDlg should be modeless so that multiple dialogs can be opened simultaneously.

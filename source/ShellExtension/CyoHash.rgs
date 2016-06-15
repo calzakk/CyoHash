@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'CyoHash'
+		'CyoHash.DLL'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}

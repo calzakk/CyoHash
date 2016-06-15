@@ -1,0 +1,7 @@
+CyoHash.h
+CyoHash_i.c
+CyoHash_p.c
+Debug
+Release
+dlldata.c
+x64

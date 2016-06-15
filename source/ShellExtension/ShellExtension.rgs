@@ -1,0 +1,37 @@
+HKCR
+{
+	CyoHash.ShellExtension.1 = s 'ShellExtension Class'
+	{
+		CLSID = s '{0026FF13-16AE-462B-8C7B-C07DA5CD386E}'
+	}
+	CyoHash.ShellExtension = s 'ShellExtension Class'
+	{
+		CLSID = s '{0026FF13-16AE-462B-8C7B-C07DA5CD386E}'
+		CurVer = s 'CyoHash.ShellExtension.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0026FF13-16AE-462B-8C7B-C07DA5CD386E} = s 'ShellExtension Class'
+		{
+			ProgID = s 'CyoHash.ShellExtension.1'
+			VersionIndependentProgID = s 'CyoHash.ShellExtension'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{16E0FFA4-6142-40A7-B385-820D66B71B16}'
+		}
+	}
+	NoRemove *
+	{
+		NoRemove shellex
+		{
+			NoRemove ContextMenuHandlers
+			{
+				ForceRemove CyoHash = s '{0026FF13-16AE-462B-8C7B-C07DA5CD386E}'
+			}
+		}
+	}
+}

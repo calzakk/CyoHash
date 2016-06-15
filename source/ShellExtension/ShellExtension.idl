@@ -1,0 +1,59 @@
+//////////////////////////////////////////////////////////////////////
+// CyoHash.idl - part of the CyoHash application
+//
+// Copyright (c) 2009-2016, Graham Bull.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//  * Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+//
+//  * Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//////////////////////////////////////////////////////////////////////
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+    object,
+    uuid(4FA818A6-6754-4214-9818-38C9648894CD),
+    dual,
+    nonextensible,
+    helpstring("IShellExtension Interface"),
+    pointer_default(unique)
+]
+interface IShellExtension : IDispatch{
+};
+
+[
+    uuid(16E0FFA4-6142-40A7-B385-820D66B71B16),
+    version(1.0),
+    helpstring("CyoHash 1.0 Type Library")
+]
+library CyoHashLib
+{
+    importlib("stdole2.tlb");
+    [
+        uuid(0026FF13-16AE-462B-8C7B-C07DA5CD386E),
+        helpstring("ShellExtension Class")
+    ]
+    coclass ShellExtension
+    {
+        [default] interface IShellExtension;
+    };
+};
