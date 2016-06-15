@@ -1,6 +1,5 @@
 # CyoHash
 
-CyoHash is a simple shell extension that is used from within Windows Explorer to calculate the MD5 hash, SHA1 hash, or CRC32 checksum of a file. (Additional SHA256, SHA384, and SHA512 algorithms are available for users of Windows XP SP3 or newer.)
 
 ## Building
 
