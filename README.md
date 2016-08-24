@@ -6,11 +6,11 @@ CyoHash is a simple shell extension that is used from within Windows Explorer to
 
 CyoHash in built using Microsoft Visual Studio 2015 (but will probably also build with an earlier version). The installer is built using NSIS (http://nsis.sourceforge.net/Download).
 
-1. Build the solution:
+### 1. Build the solution
 
 Load the source\CyoHash.sln solution file into Visual Studio and perform a release build of both the Win32 and x64 configurations.  This will build the main application, the shell extension, and the installer plugin.
 
-2. Build the installer:
+### 2. Build the installer
 
 After building the solution, simply right-click the installer file (ie. install\CyoHash.nsi) and select 'Compile NSIS Script' to build the installer executable. Alternatively, drag the .nsi file into the NSIS Compiler (MakeNSISW).
 
