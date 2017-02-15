@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,2,0,1
- PRODUCTVERSION 2,2,0,0
+ FILEVERSION 2,3,0,0
+ PRODUCTVERSION 2,3,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -68,12 +68,12 @@ BEGIN
         BLOCK "080904b0"
         BEGIN
             VALUE "FileDescription", "CyoHash"
-            VALUE "FileVersion", "2.2.0.1"
+            VALUE "FileVersion", "2.3.0.0"
             VALUE "InternalName", "CyoHash.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2009-2016, Graham Bull. All rights reserved."
+            VALUE "LegalCopyright", "Copyright (c) 2009-2017, Graham Bull. All rights reserved."
             VALUE "OriginalFilename", "CyoHash.exe"
             VALUE "ProductName", "CyoHash"
-            VALUE "ProductVersion", "2.2.0"
+            VALUE "ProductVersion", "2.3.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -131,7 +131,7 @@ CAPTION "About CyoHash"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDCANCEL,90,72,50,14
-    LTEXT           "CyoHash - Version 2.2",IDC_STATIC,42,12,174,12,SS_CENTERIMAGE
+    LTEXT           "CyoHash - Version 2.3",IDC_STATIC,42,12,174,12,SS_CENTERIMAGE
     ICON            IDI_CYOHASH,IDC_STATIC,12,12,20,20
     LTEXT           "Created by Graham Bull",IDC_STATIC,42,30,174,12,SS_CENTERIMAGE
     CONTROL         "<a>https://github.com/calzakk/CyoHash</a>",IDC_PROJECTLINK,
@@ -338,4 +338,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

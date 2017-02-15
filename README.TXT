@@ -2,11 +2,11 @@
 CyoHash
 https://github.com/calzakk/CyoHash
 
-Copyright (c) 2009-2016, Graham Bull. All rights reserved.
+Copyright (c) 2009-2017, Graham Bull. All rights reserved.
 ===============================================================================
 
-Version 2.2.0.1
-Release Date 4th February 2016
+Version 2.3.0.0
+Release Date 15th February 2017
 
 -------------------------------------------------------------------------------
 1. License
@@ -48,6 +48,9 @@ a hash function from the CyoHash context menu.
 -------------------------------------------------------------------------------
 4. Release Notes
 -------------------------------------------------------------------------------
+
+2.3.0 - 15th February 2017
+- Ability to hash all files in a folder.
 
 2.2.0 - 13th September 2015
 - Ability to sort items by pathname, algorithm, or hash value.

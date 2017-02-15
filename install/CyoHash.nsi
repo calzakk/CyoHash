@@ -1,7 +1,7 @@
 ;---------------------------------------------------------------------
 ; CyoHash.nsi - part of the CyoHash application
 ;
-; Copyright (c) 2009-2016, Graham Bull.
+; Copyright (c) 2009-2017, Graham Bull.
 ; All rights reserved.
 ;
 ; Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@ SetCompressor /SOLID /FINAL LZMA
 Name "CyoHash"
 OutFile "CyoHash.exe"
 
-!define PRODUCT_VERSION 2.2.0
-!define FILE_VERSION    2.2.0.1
+!define PRODUCT_VERSION 2.3.0
+!define FILE_VERSION    2.3.0.0
 
 VIProductVersion "${FILE_VERSION}"
 VIAddVersionKey "FileVersion" "${FILE_VERSION}"
@@ -45,7 +45,7 @@ VIAddVersionKey "ProductVersion" "${PRODUCT_VERSION}"
 VIAddVersionKey "ProductName" "CyoHash"
 VIAddVersionKey "Comments" ""
 VIAddVersionKey "CompanyName" ""
-VIAddVersionKey "LegalCopyright" "(c) 2009-2016, Graham Bull. All rights reserved."
+VIAddVersionKey "LegalCopyright" "(c) 2009-2017, Graham Bull. All rights reserved."
 VIAddVersionKey "LegalTrademarks" ""
 VIAddVersionKey "FileDescription" "CyoHash"
 VIAddVersionKey "OriginalFilename" "CyoHash.exe"
