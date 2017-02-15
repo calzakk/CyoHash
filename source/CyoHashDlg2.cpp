@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // CyoHashDlg2.cpp - part of the CyoHash application
 //
-// Copyright (c) 2009-2016, Graham Bull.
+// Copyright (c) 2009-2017, Graham Bull.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -198,7 +198,8 @@ LRESULT CyoHashDlg2::OnInitDialog( UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
         throw;
     }
 
-    BeginHashing( m_pathname, m_algorithm );
+    if (!BeginHashing( m_pathname, m_algorithm ))
+        EndDialog( IDCANCEL );
 
     ::SetEvent( m_dialogReadyEvent );
 
@@ -966,7 +967,7 @@ void CyoHashDlg2::OnMessageReceived( LPBYTE start, DWORD length )
     BeginHashing( pathname, algorithm );
 }
 
-void CyoHashDlg2::BeginHashing( LPCWSTR pathname, LPCWSTR algorithm )
+bool CyoHashDlg2::BeginHashing( LPCWSTR pathname, LPCWSTR algorithm )
 {
     CStringW str = pathname;
     int start = 0;
@@ -976,20 +977,117 @@ void CyoHashDlg2::BeginHashing( LPCWSTR pathname, LPCWSTR algorithm )
         if (start < 0)
             break;
 
-        int key = SafeCreateHashData( curr, algorithm );
-
-        HANDLE readyEvent = ::CreateEventW( NULL, TRUE, FALSE, NULL );
-        ThreadData data = { *this, key, readyEvent };
-
-        DWORD threadId;
-        HANDLE thread = ::CreateThread( NULL, 0, &StaticHashThread, &data, CREATE_SUSPENDED, &threadId );
-        SafeSetThreadHandle( key, thread );
-        ::ResumeThread( thread );
-        if (::WaitForSingleObject( readyEvent, 30000 ) != WAIT_OBJECT_0)
+        if (::PathIsDirectoryW(curr))
         {
-            //::OutputDebugStringW( L"ERROR: WaitForSingleObject failed\n" );
-            throw;
+            wchar_t szCompactPath[49];
+            ::PathCompactPathExW(szCompactPath, curr, _countof(szCompactPath), 0);
+            std::wostringstream title;
+            title << L"CyoHash - " << szCompactPath;
+
+            bool recurse = false;
+            const int MaxFilesWithoutConfirmation = 50;
+
+            int numFiles = 0, numFolders = 0;
+            CountFilesToHash(curr, false, numFiles, numFolders);
+
+            if (numFiles == 0)
+            {
+                ::MessageBoxW(m_hWnd, L"There are no files in this folder!", title.str().c_str(), MB_OK);
+                return false;
+            }
+
+            if (numFolders >= 1)
+            {
+                int res = ::MessageBoxW(m_hWnd, L"Do you want to hash all files in all subfolders?", title.str().c_str(), MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION);
+                if (res == IDYES)
+                {
+                    numFiles = numFolders = 0;
+                    CountFilesToHash(curr, recurse = true, numFiles, numFolders);
+                }
+            }
+
+            if (numFiles > MaxFilesWithoutConfirmation)
+            {
+                std::wostringstream msg;
+                msg << numFiles << L" files have been found.\n\nDo you want to hash them all?";
+                int res = ::MessageBoxW(m_hWnd, msg.str().c_str(), title.str().c_str(), MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION);
+                if (res != IDYES)
+                    return false;
+            }
+
+            FindFilesToHash(curr, recurse, algorithm);
         }
+        else
+        {
+            BeginHashingFile(curr, algorithm);
+        }
+    }
+
+    return true;
+}
+
+void CyoHashDlg2::CountFilesToHash(const CStringW& path, bool recurse, int& numFiles, int& numFolders)
+{
+    WIN32_FIND_DATAW fd = { 0 };
+    HANDLE hSearch = ::FindFirstFileW(path + L"\\*.*", &fd);
+    if (hSearch != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if ((std::wcscmp(fd.cFileName, L".") != 0)
+                && (std::wcscmp(fd.cFileName, L"..") != 0))
+            {
+                if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+                    ++numFiles;
+                else
+                {
+                    ++numFolders;
+                    if (recurse)
+                        CountFilesToHash(path + L'\\' + fd.cFileName, recurse, numFiles, numFolders);
+                }
+            }
+        } while (::FindNextFileW(hSearch, &fd));
+        ::FindClose(hSearch);
+    }
+}
+
+void CyoHashDlg2::FindFilesToHash(const CStringW& path, bool recurse, LPCWSTR algorithm)
+{
+    WIN32_FIND_DATAW fd = { 0 };
+    HANDLE hSearch = ::FindFirstFileW(path + L"\\*.*", &fd);
+    if (hSearch != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if ((std::wcscmp(fd.cFileName, L".") != 0)
+                && (std::wcscmp(fd.cFileName, L"..") != 0))
+            {
+                CString fullPathname = (path + L'\\' + fd.cFileName);
+                if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+                    BeginHashingFile(fullPathname, algorithm);
+                else if (recurse)
+                    FindFilesToHash(fullPathname, recurse, algorithm);
+            }
+        } while (::FindNextFileW(hSearch, &fd));
+        ::FindClose(hSearch);
+    }
+}
+
+void CyoHashDlg2::BeginHashingFile(LPCWSTR pathname, LPCWSTR algorithm)
+{
+    int key = SafeCreateHashData(pathname, algorithm);
+
+    HANDLE readyEvent = ::CreateEventW(NULL, TRUE, FALSE, NULL);
+    ThreadData data = { *this, key, readyEvent };
+
+    DWORD threadId;
+    HANDLE thread = ::CreateThread(NULL, 0, &StaticHashThread, &data, CREATE_SUSPENDED, &threadId);
+    SafeSetThreadHandle(key, thread);
+    ::ResumeThread(thread);
+    if (::WaitForSingleObject(readyEvent, 30000) != WAIT_OBJECT_0)
+    {
+        //::OutputDebugStringW( L"ERROR: WaitForSingleObject failed\n" );
+        throw;
     }
 }
 

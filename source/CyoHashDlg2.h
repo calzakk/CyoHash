@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // CyoHashDlg2.h - part of the CyoHash application
 //
-// Copyright (c) 2009-2016, Graham Bull.
+// Copyright (c) 2009-2017, Graham Bull.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -195,7 +195,10 @@ private:
     void HashDroppedFiles( LPCWSTR algorithm );
     static DWORD WINAPI StaticPipeThread( LPVOID param );
     void PipeThread();
-    void BeginHashing( LPCWSTR pathname, LPCWSTR algorithm );
+    bool BeginHashing( LPCWSTR pathname, LPCWSTR algorithm );
+    void BeginHashingFile( LPCWSTR pathname, LPCWSTR algorithm );
+    void CountFilesToHash( const CStringW& path, bool recurse, int& numFiles, int& numFolders );
+    void FindFilesToHash( const CStringW& path, bool recurse, LPCWSTR algorithm );
     void SortList();
     static int CALLBACK StaticCompareFunc( LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort );
     int CompareFunc( LPARAM lParam1, LPARAM lParam2 );

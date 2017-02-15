@@ -34,4 +34,14 @@ HKCR
 			}
 		}
 	}
+	NoRemove Folder
+	{
+		NoRemove shellex
+		{
+			NoRemove ContextMenuHandlers
+			{
+				ForceRemove CyoHash = s '{0026FF13-16AE-462B-8C7B-C07DA5CD386E}'
+			}
+		}
+	}
 }
