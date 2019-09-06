@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // BrowseDlg.cpp - part of the CyoHash application
 //
-// Copyright (c) 2009-2016, Graham Bull.
-// All rights reserved.
+// Copyright (c) Graham Bull. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -37,13 +36,10 @@ BrowseDlg::BrowseDlg( CString& strPathname, CString& strAlgorithm )
     m_strPathname( strPathname ),
     m_strAlgorithm( strAlgorithm )
 {
-    OSVERSIONINFOEX vi = { 0 };
-    vi.dwOSVersionInfoSize = sizeof( vi );
     bool extraAlgorithms = false;
-    if (   ::GetVersionEx( (LPOSVERSIONINFO)&vi )
-        && (   (vi.dwMajorVersion >= 6) //Vista+
-            || (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 2) //2003 or XP64
-            || (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 1 && vi.wServicePackMajor >= 3))) //XP SP3+
+    if (   ::IsWindowsVistaOrGreater()
+        || ::IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WS03), LOBYTE(_WIN32_WINNT_WS03), 0) //2003 or XP64
+        || ::IsWindowsXPSP3OrGreater())
         extraAlgorithms = true;
 
     int numAlgorithms = (extraAlgorithms ? 7 : 4);

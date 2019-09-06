@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // stdafx.h - part of the CyoHash application
 //
-// Copyright (c) 2009-2016, Graham Bull.
-// All rights reserved.
+// Copyright (c) Graham Bull. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -69,6 +68,8 @@ using namespace ATL;
 
 #pragma warning(disable : 4091) //prevents warning C4091: 'typedef ': ignored on left of 'tagGPFIDL_FLAGS' when no variable is declared
 #include <shlobj.h>
+
+#include <VersionHelpers.h>
 
 #include <cassert>
 #include <list>

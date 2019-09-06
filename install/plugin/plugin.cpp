@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // plugin.cpp - part of the CyoHash application
 //
-// Copyright (c) 2009-2016, Graham Bull.
-// All rights reserved.
+// Copyright (c) Graham Bull. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,11 +25,28 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////
 
-#define WIN32_LEAN_AND_MEAN
 #define STRICT
-#define WINVER 0x0500
-#define _WIN32_WINNT 0x0500     //Windows 2000 and above
-#define _WIN32_IE 0x0600        //Internet Explorer 6.0 and above
+
+#define WIN32_LEAN_AND_MEAN
+
+#ifndef NTTI_VISTA
+#   define NTTI_VISTA           0x06000000
+#endif
+#ifndef _WIN32_WINNT_VISTA
+#   define _WIN32_WINNT_VISTA   0x0600
+#endif
+#ifndef _WIN32_IE_IE70
+#   define _WIN32_IE_IE70       0x0700
+#endif
+#ifndef _WIN32_IE_VISTA
+#   define _WIN32_IE_VISTA      _WIN32_IE_IE70
+#endif
+
+#define NTDDI_VERSION   NTTI_VISTA
+#define WINVER          _WIN32_WINNT_VISTA
+#define _WIN32_WINNT    _WIN32_WINNT_VISTA
+#define _WIN32_IE       _WIN32_IE_VISTA
+
 #define _ATL_FREE_THREADED
 #define _ATL_NO_AUTOMATIC_NAMESPACE
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
@@ -38,6 +54,7 @@
 #include <atlbase.h>
 #include <ShellAPI.h>
 #include <Richedit.h>
+#include <VersionHelpers.h>
 #include <string>
 #include <fstream>
 
@@ -111,9 +128,9 @@ namespace
 
 //////////////////////////////////////////////////////////////////////
 
-namespace
+namespace detail
 {
-    bool IsWindowsX64Internal()
+    bool IsWindowsX64()
     {
         bool bWindowsX64 = false;
 
@@ -136,23 +153,7 @@ namespace
         return bWindowsX64;
     }
 
-    bool ValidatePlatformInternal()
-    {
-        OSVERSIONINFO osvi = { 0 };
-        osvi.dwOSVersionInfoSize = sizeof( osvi );
-        ::GetVersionEx( &osvi );
-
-        if (osvi.dwPlatformId != VER_PLATFORM_WIN32_NT)
-            return false; //error, 9x is not supported
-
-        if (osvi.dwMajorVersion < 5)
-            return false; //error, only 2000+ is supported
-
-        // Success
-        return true;
-    }
-
-    bool SwitchDllsOnRebootInternal( const std::string& instdir )
+    bool SwitchDllsOnReboot( const std::string& instdir )
     {
         // Delete the existing dll...
         if (!::MoveFileExA( (instdir + "\\CyoHash.dll").c_str(), NULL, MOVEFILE_DELAY_UNTIL_REBOOT ))
@@ -166,7 +167,7 @@ namespace
         return true;
     }
 
-    bool InitRichEditControlInternal( const std::string& wnd, const std::string& pathname )
+    bool InitRichEditControl( const std::string& wnd, const std::string& pathname )
     {
         HWND hWnd = (HWND)atoi( wnd.c_str() );
 
@@ -250,7 +251,7 @@ namespace
         return true;
     }
 
-    void OnNotifyInternal( const std::string& wnd, const std::string& code, const std::string& nmhdr )
+    void OnNotify( const std::string& wnd, const std::string& code, const std::string& nmhdr )
     {
         if (atoi( code.c_str() ) != EN_LINK)
             return;
@@ -274,9 +275,11 @@ namespace
 
 //////////////////////////////////////////////////////////////////////
 
+extern "C" {
+
 PLUGINFUNCTION( IsWindowsX64 )
 {
-    if (IsWindowsX64Internal())
+    if (detail::IsWindowsX64())
         pushstring( "1" );
     else
         pushstring( "0" );
@@ -285,7 +288,7 @@ PLUGINFUNCTIONEND
 
 PLUGINFUNCTION( ValidatePlatform )
 {
-    if (ValidatePlatformInternal())
+    if (::IsWindowsXPOrGreater())
         pushstring( "1" );
     else
         pushstring( "0" );
@@ -294,7 +297,7 @@ PLUGINFUNCTIONEND
 
 PLUGINFUNCTION( SwitchDllsOnReboot )
 {
-    if (SwitchDllsOnRebootInternal( popstring() ))
+    if (detail::SwitchDllsOnReboot( popstring() ))
         pushstring( "1" );
     else
         pushstring( "0" );
@@ -305,7 +308,7 @@ PLUGINFUNCTION( InitRichEditControl )
 {
     const std::string wnd = popstring();
     const std::string pathname = popstring();
-    if (InitRichEditControlInternal( wnd, pathname ))
+    if (detail::InitRichEditControl( wnd, pathname ))
         pushstring( "1" );
     else
         pushstring( "0" );
@@ -317,6 +320,8 @@ PLUGINFUNCTION( OnNotify )
     const std::string wnd = popstring();
     const std::string code = popstring();
     const std::string nmhdr = popstring();
-    OnNotifyInternal( wnd, code, nmhdr );
+    detail::OnNotify( wnd, code, nmhdr );
 }
 PLUGINFUNCTIONEND
+
+}

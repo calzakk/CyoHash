@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // ShellExtension.cpp - part of the CyoHash application
 //
-// Copyright (c) 2009-2016, Graham Bull.
-// All rights reserved.
+// Copyright (c) Graham Bull. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -38,22 +37,17 @@ HRESULT CShellExtension::FinalConstruct()
     m_hSubMenu = NULL;
     m_extraAlgorithms = false;
 
-    OSVERSIONINFOEX vi = { 0 };
-    vi.dwOSVersionInfoSize = sizeof( OSVERSIONINFOEX );
-    if (::GetVersionEx( (OSVERSIONINFO*)&vi ))
+    if (::IsWindowsVistaOrGreater()) //Vista or greater (not XP/2003)
     {
-        if (vi.dwMajorVersion >= 6) //Vista or greater (not XP/2003)
-        {
-            m_hBitmap = (HBITMAP)::LoadImage( ::GetModuleHandle( _T("CyoHash.dll") ),
-                MAKEINTRESOURCE( IDB_CYOHASH ), IMAGE_BITMAP, 16, 16, LR_LOADMAP3DCOLORS );
-        }
+        m_hBitmap = (HBITMAP)::LoadImage( ::GetModuleHandle( _T("CyoHash.dll") ),
+            MAKEINTRESOURCE( IDB_CYOHASH ), IMAGE_BITMAP, 16, 16, LR_LOADMAP3DCOLORS );
+    }
 
-        if (   (vi.dwMajorVersion >= 6) //Vista+
-            || (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 2) //2003 or XP64
-            || (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 1 && vi.wServicePackMajor >= 3)) //XP SP3+
-        {
-            m_extraAlgorithms = true;
-        }
+    if (   ::IsWindowsVistaOrGreater()
+        || ::IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WS03), LOBYTE(_WIN32_WINNT_WS03), 0) //2003 or XP64
+        || ::IsWindowsXPSP3OrGreater())
+    {
+        m_extraAlgorithms = true;
     }
 
     return S_OK;

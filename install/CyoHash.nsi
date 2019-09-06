@@ -1,8 +1,7 @@
 ;---------------------------------------------------------------------
 ; CyoHash.nsi - part of the CyoHash application
 ;
-; Copyright (c) 2009-2017, Graham Bull.
-; All rights reserved.
+; Copyright (c) Graham Bull. All rights reserved.
 ;
 ; Redistribution and use in source and binary forms, with or without
 ; modification, are permitted provided that the following conditions are met:
@@ -45,7 +44,7 @@ VIAddVersionKey "ProductVersion" "${PRODUCT_VERSION}"
 VIAddVersionKey "ProductName" "CyoHash"
 VIAddVersionKey "Comments" ""
 VIAddVersionKey "CompanyName" ""
-VIAddVersionKey "LegalCopyright" "(c) 2009-2017, Graham Bull. All rights reserved."
+VIAddVersionKey "LegalCopyright" "(c) Graham Bull. All rights reserved."
 VIAddVersionKey "LegalTrademarks" ""
 VIAddVersionKey "FileDescription" "CyoHash"
 VIAddVersionKey "OriginalFilename" "CyoHash.exe"

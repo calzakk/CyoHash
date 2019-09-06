@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // Hasher.cpp - part of the CyoHash application
 //
-// Copyright (c) 2009-2016, Graham Bull.
-// All rights reserved.
+// Copyright (c) Graham Bull. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -145,10 +144,7 @@ const LPCTSTR SHAHasher::GetName() const
 void SHAHasher::Init()
 {
     LPCWSTR provider = MS_ENH_RSA_AES_PROV;
-    OSVERSIONINFOEX vi = { 0 };
-    vi.dwOSVersionInfoSize = sizeof( vi );
-    if (   ::GetVersionEx( (LPOSVERSIONINFO)&vi )
-        && (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 1)) //XP
+    if (::IsWindowsXPOrGreater())
         provider = L"Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)";
 
     if (   !::CryptAcquireContext( &m_hProv, NULL, provider, PROV_RSA_AES, CRYPT_VERIFYCONTEXT )

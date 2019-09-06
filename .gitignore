@@ -1,4 +1,5 @@
 *.db
+*.user
 .vs
 Debug
 Release

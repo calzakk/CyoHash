@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "CyoHash"
             VALUE "FileVersion", "2.3.0.0"
             VALUE "InternalName", "CyoHash.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2009-2017, Graham Bull. All rights reserved."
+            VALUE "LegalCopyright", "Copyright (c) Graham Bull. All rights reserved."
             VALUE "OriginalFilename", "CyoHash.exe"
             VALUE "ProductName", "CyoHash"
             VALUE "ProductVersion", "2.3.0"

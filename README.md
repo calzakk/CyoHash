@@ -24,8 +24,7 @@ After installing, simply access CyoHash by right-clicking a file and selecting a
 
 All the files in this library are covered under the terms of the Berkeley Software Distribution (BSD) License:
 
-Copyright (c) 2009-2017, Graham Bull.
-All rights reserved.
+Copyright (c) Graham Bull. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

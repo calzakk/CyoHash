@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // CyoHashDlg2.cpp - part of the CyoHash application
 //
-// Copyright (c) 2009-2017, Graham Bull.
-// All rights reserved.
+// Copyright (c) Graham Bull. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -236,12 +235,9 @@ LRESULT CyoHashDlg2::OnDropFiles( UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
     ::DragFinish( hDrop );
 
     HMENU hSubMenu = NULL;
-    OSVERSIONINFOEX vi = { 0 };
-    vi.dwOSVersionInfoSize = sizeof( vi );
-    if (   ::GetVersionEx( (LPOSVERSIONINFO)&vi )
-        && (   (vi.dwMajorVersion >= 6) //Vista+
-            || (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 2) //2003 or XP64
-            || (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 1 && vi.wServicePackMajor >= 3))) //XP SP3+
+    if (   ::IsWindowsVistaOrGreater()
+        || ::IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WS03), LOBYTE(_WIN32_WINNT_WS03), 0) //2003 or XP64
+        || ::IsWindowsXPSP3OrGreater())
         hSubMenu = ::GetSubMenu( m_hMenu, SUBMENU_ALLHASHES );
     else
         hSubMenu = ::GetSubMenu( m_hMenu, SUBMENU_HASHES );
@@ -1110,13 +1106,10 @@ void CyoHashDlg2::HashThread( ThreadData* data )
     CStringW algorithm = hashData.algorithm;
     algorithm.MakeUpper();
 
-    OSVERSIONINFOEX vi = { 0 };
-    vi.dwOSVersionInfoSize = sizeof( vi );
     bool extraAlgorithms = false;
-    if (   ::GetVersionEx( (LPOSVERSIONINFO)&vi )
-        && (   (vi.dwMajorVersion >= 6) //Vista+
-            || (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 2) //2003 or XP64
-            || (vi.dwMajorVersion == 5 && vi.dwMinorVersion == 1 && vi.wServicePackMajor >= 3))) //XP SP3+
+    if (   ::IsWindowsVistaOrGreater()
+        || ::IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WS03), LOBYTE(_WIN32_WINNT_WS03), 0) //2003 or XP64
+        || ::IsWindowsXPSP3OrGreater())
         extraAlgorithms = true;
 
     std::auto_ptr< IHasher > hasher;

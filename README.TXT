@@ -2,7 +2,7 @@
 CyoHash
 https://github.com/calzakk/CyoHash
 
-Copyright (c) 2009-2017, Graham Bull. All rights reserved.
+Copyright (c) Graham Bull. All rights reserved.
 ===============================================================================
 
 Version 2.3.0.0
