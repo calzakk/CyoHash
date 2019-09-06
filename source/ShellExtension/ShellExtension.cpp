@@ -35,20 +35,9 @@ HRESULT CShellExtension::FinalConstruct()
 {
     m_hBitmap = NULL;
     m_hSubMenu = NULL;
-    m_extraAlgorithms = false;
 
-    if (::IsWindowsVistaOrGreater()) //Vista or greater (not XP/2003)
-    {
-        m_hBitmap = (HBITMAP)::LoadImage( ::GetModuleHandle( _T("CyoHash.dll") ),
-            MAKEINTRESOURCE( IDB_CYOHASH ), IMAGE_BITMAP, 16, 16, LR_LOADMAP3DCOLORS );
-    }
-
-    if (   ::IsWindowsVistaOrGreater()
-        || ::IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WS03), LOBYTE(_WIN32_WINNT_WS03), 0) //2003 or XP64
-        || ::IsWindowsXPSP3OrGreater())
-    {
-        m_extraAlgorithms = true;
-    }
+    m_hBitmap = (HBITMAP)::LoadImage( ::GetModuleHandle( _T("CyoHash.dll") ),
+        MAKEINTRESOURCE( IDB_CYOHASH ), IMAGE_BITMAP, 16, 16, LR_LOADMAP3DCOLORS );
 
     return S_OK;
 }
@@ -152,10 +141,10 @@ STDMETHODIMP CShellExtension::InvokeCommand( LPCMINVOKECOMMANDINFO pCmdInfo )
             case 1: algorithm = L"MD5"; break;
             case 2: algorithm = L"SHA1"; break;
             case 3: algorithm = L"SHA1-BASE32"; break;
-            case 4: algorithm = (m_extraAlgorithms ? L"SHA256" : L"CRC32"); break;
-            case 5: algorithm = (m_extraAlgorithms ? L"SHA384" : L""); break;
-            case 6: algorithm = (m_extraAlgorithms ? L"SHA512" : L""); break;
-            case 7: algorithm = (m_extraAlgorithms ? L"CRC32" : L""); break;
+            case 4: algorithm = L"SHA256"; break;
+            case 5: algorithm = L"SHA384"; break;
+            case 6: algorithm = L"SHA512"; break;
+            case 7: algorithm = L"CRC32"; break;
             }
 
             if (!algorithm.empty())
@@ -295,12 +284,9 @@ HMENU CShellExtension::CreateSubMenu(UINT uidFirstCmd, UINT& nextCmd) const
     ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("MD5"));
     ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("SHA1"));
     ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("SHA1(base32)"));
-    if (m_extraAlgorithms)
-    {
-        ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("SHA256"));
-        ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("SHA384"));
-        ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("SHA512"));
-    }
+    ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("SHA256"));
+    ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("SHA384"));
+    ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("SHA512"));
     ::InsertMenu(hSubMenu, index++, MF_BYPOSITION | MF_STRING, nextCmd++, _T("CRC32"));
 
     return hSubMenu;

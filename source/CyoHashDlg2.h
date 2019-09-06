@@ -70,6 +70,7 @@ BEGIN_MSG_MAP( CyoHashDlg2 )
     COMMAND_HANDLER( IDC_MENU_CLEAR, BN_CLICKED, OnMenuClear )
     COMMAND_HANDLER( IDC_MENU_CLEARALL, BN_CLICKED, OnMenuClearAll )
     COMMAND_HANDLER( IDC_MENU_HASHFILE, BN_CLICKED, OnMenuHashFile )
+    COMMAND_HANDLER( IDC_MENU_ALWAYS_ON_TOP, BN_CLICKED, OnMenuAlwaysOnTop )
     COMMAND_HANDLER( IDC_MENU_ABOUT, BN_CLICKED, OnMenuAbout )
     COMMAND_HANDLER( IDC_MENU_MD5, BN_CLICKED, OnMenuMD5 )
     COMMAND_HANDLER( IDC_MENU_SHA1, BN_CLICKED, OnMenuSHA1 )
@@ -110,6 +111,7 @@ END_MSG_MAP()
     LRESULT OnMenuClear( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuClearAll( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuHashFile( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
+    LRESULT OnMenuAlwaysOnTop( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuAbout( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuMD5( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuSHA1( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
@@ -177,7 +179,8 @@ private:
     HashMap m_hashData;
     CWindow m_listWnd;
     CAtlList<CStringW> m_droppedFiles;
-    SortBy m_sortby;
+    SortBy m_sortBy;
+    bool m_alwaysOnTop;
 
     // Implementation
     void ReadLastSettings();

@@ -69,8 +69,6 @@ using namespace ATL;
 #pragma warning(disable : 4091) //prevents warning C4091: 'typedef ': ignored on left of 'tagGPFIDL_FLAGS' when no variable is declared
 #include <shlobj.h>
 
-#include <VersionHelpers.h>
-
 #include <cassert>
 #include <list>
 #include <memory>

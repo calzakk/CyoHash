@@ -36,26 +36,13 @@ BrowseDlg::BrowseDlg( CString& strPathname, CString& strAlgorithm )
     m_strPathname( strPathname ),
     m_strAlgorithm( strAlgorithm )
 {
-    bool extraAlgorithms = false;
-    if (   ::IsWindowsVistaOrGreater()
-        || ::IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WS03), LOBYTE(_WIN32_WINNT_WS03), 0) //2003 or XP64
-        || ::IsWindowsXPSP3OrGreater())
-        extraAlgorithms = true;
-
-    int numAlgorithms = (extraAlgorithms ? 7 : 4);
-    m_algorithms.resize( numAlgorithms );
-    int index = 0;
-    m_algorithms[ index++ ] = _T("MD5");
-    m_algorithms[ index++ ] = _T("SHA1");
-    m_algorithms[ index++ ] = _T("SHA1-base32");
-    if (extraAlgorithms)
-    {
-        m_algorithms[ index++ ] = _T("SHA256");
-        m_algorithms[ index++ ] = _T("SHA384");
-        m_algorithms[ index++ ] = _T("SHA512");
-    }
-    m_algorithms[ index++ ] = _T("CRC32");
-    assert( index == numAlgorithms );
+    m_algorithms.push_back(_T("MD5"));
+    m_algorithms.push_back(_T("SHA1"));
+    m_algorithms.push_back(_T("SHA1-base32"));
+    m_algorithms.push_back(_T("SHA256"));
+    m_algorithms.push_back(_T("SHA384"));
+    m_algorithms.push_back(_T("SHA512"));
+    m_algorithms.push_back(_T("CRC32"));
 }
 
 BrowseDlg::~BrowseDlg()

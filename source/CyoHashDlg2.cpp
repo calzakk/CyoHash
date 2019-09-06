@@ -45,8 +45,7 @@ namespace
     const int SUBMENU_COMPLETED = 3;
     const int SUBMENU_CANCELLED = 4;
     const int SUBMENU_LIST = 5;
-    const int SUBMENU_HASHES = 6;
-    const int SUBMENU_ALLHASHES = 7;
+    const int SUBMENU_ALLHASHES = 6;
 
     class NamedPipeServerCallback : public INamedPipeServerCallback
     {
@@ -85,7 +84,8 @@ CyoHashDlg2::CyoHashDlg2( LPCWSTR pipeName, HANDLE dialogReadyEvent, LPCWSTR pat
     m_pathname( pathname ),
     m_algorithm( algorithm ),
     m_nextKey( 0 ),
-    m_sortby( Unsorted )
+    m_sortBy( Unsorted ),
+    m_alwaysOnTop( true )
 {
     m_sync.Init();
 
@@ -184,7 +184,7 @@ LRESULT CyoHashDlg2::OnInitDialog( UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
     ResizeList();
 
     BringWindowToTop();
-    SetWindowPos( HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+    SetWindowPos(m_alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
     SetIcon( m_hIcon, TRUE );
     SetIcon( m_hIcon, FALSE );
@@ -234,13 +234,7 @@ LRESULT CyoHashDlg2::OnDropFiles( UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 
     ::DragFinish( hDrop );
 
-    HMENU hSubMenu = NULL;
-    if (   ::IsWindowsVistaOrGreater()
-        || ::IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WS03), LOBYTE(_WIN32_WINNT_WS03), 0) //2003 or XP64
-        || ::IsWindowsXPSP3OrGreater())
-        hSubMenu = ::GetSubMenu( m_hMenu, SUBMENU_ALLHASHES );
-    else
-        hSubMenu = ::GetSubMenu( m_hMenu, SUBMENU_HASHES );
+    HMENU hSubMenu = ::GetSubMenu( m_hMenu, SUBMENU_ALLHASHES );
 
     ATLASSERT( hSubMenu != NULL );
     ::TrackPopupMenu( hSubMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON, point.x, point.y, 0, m_hWnd, NULL );
@@ -315,7 +309,7 @@ int CyoHashDlg2::CompareFunc(LPARAM lParam1, LPARAM lParam2)
     int key1 = (int)lParam1;
     int key2 = (int)lParam2;
 
-    if (m_sortby == Unsorted)
+    if (m_sortBy == Unsorted)
     {
         if (key1 < key2)
             return -1;
@@ -328,7 +322,7 @@ int CyoHashDlg2::CompareFunc(LPARAM lParam1, LPARAM lParam2)
     int item1 = FindItem( key1 );
     int item2 = FindItem( key2 );
     int subitem;
-    switch (m_sortby)
+    switch (m_sortBy)
     {
     case SortByFile: subitem = 0; break;
     case SortByAlgorithm: subitem = 1; break;
@@ -609,6 +603,15 @@ LRESULT CyoHashDlg2::OnMenuHashFile( WORD wNotifyCode, WORD wID, HWND hWndCtl, B
     return 0;
 }
 
+LRESULT CyoHashDlg2::OnMenuAlwaysOnTop( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
+{
+    m_alwaysOnTop = !m_alwaysOnTop;
+    SetWindowPos(m_alwaysOnTop ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+    bHandled = TRUE;
+    return 0;
+}
+
 LRESULT CyoHashDlg2::OnMenuAbout( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
     AboutDlg dlg;
@@ -676,7 +679,7 @@ LRESULT CyoHashDlg2::OnMenuCRC32( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL
 
 LRESULT CyoHashDlg2::OnMenuUnsorted( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
-    m_sortby = Unsorted;
+    m_sortBy = Unsorted;
     SortList();
 
     bHandled = TRUE;
@@ -685,7 +688,7 @@ LRESULT CyoHashDlg2::OnMenuUnsorted( WORD wNotifyCode, WORD wID, HWND hWndCtl, B
 
 LRESULT CyoHashDlg2::OnMenuSortByFile( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
-    m_sortby = SortByFile;
+    m_sortBy = SortByFile;
     SortList();
 
     bHandled = TRUE;
@@ -694,7 +697,7 @@ LRESULT CyoHashDlg2::OnMenuSortByFile( WORD wNotifyCode, WORD wID, HWND hWndCtl,
 
 LRESULT CyoHashDlg2::OnMenuSortByAlgorithm( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
-    m_sortby = SortByAlgorithm;
+    m_sortBy = SortByAlgorithm;
     SortList();
 
     bHandled = TRUE;
@@ -703,7 +706,7 @@ LRESULT CyoHashDlg2::OnMenuSortByAlgorithm( WORD wNotifyCode, WORD wID, HWND hWn
 
 LRESULT CyoHashDlg2::OnMenuSortByHash( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
-    m_sortby = SortByHash;
+    m_sortBy = SortByHash;
     SortList();
 
     bHandled = TRUE;
@@ -724,7 +727,9 @@ void CyoHashDlg2::ReadLastSettings()
     m_lastWidth = ReadIntFromRegistry( hKey, L"cx", -1 );
     m_lastHeight  = ReadIntFromRegistry( hKey, L"cy", -1 );
 
-    m_sortby = (SortBy)ReadIntFromRegistry( hKey, L"sortBy", (int)Unsorted );
+    m_sortBy = (SortBy)ReadIntFromRegistry( hKey, L"sortBy", (int)Unsorted );
+
+    m_alwaysOnTop = ReadIntFromRegistry( hKey, L"alwaysOnTop", 0 ) != 0;
 
     ::RegCloseKey( hKey );
 }
@@ -754,7 +759,9 @@ void CyoHashDlg2::SaveCurrentSettings()
     WriteIntToRegistry( hKey, L"cx", rect.right - rect.left );
     WriteIntToRegistry( hKey, L"cy", rect.bottom - rect.top );
 
-    WriteIntToRegistry( hKey, L"sortBy", (int)m_sortby );
+    WriteIntToRegistry(hKey, L"sortBy", (int)m_sortBy);
+
+    WriteIntToRegistry(hKey, L"alwaysOnTop", m_alwaysOnTop ? 1 : 0);
 
     ::RegCloseKey( hKey );
 }
@@ -907,10 +914,12 @@ void CyoHashDlg2::ShowPopupMenu( int x, int y )
     HMENU hSubMenu = ::GetSubMenu( m_hMenu, submenu );
     ATLASSERT( hSubMenu != NULL );
 
-    ::CheckMenuItem( hSubMenu, IDC_MENU_UNSORTED, MF_BYCOMMAND | (m_sortby == Unsorted ? MF_CHECKED : MF_UNCHECKED) );
-    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_FILE, MF_BYCOMMAND | (m_sortby == SortByFile ? MF_CHECKED : MF_UNCHECKED) );
-    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_ALGORITHM, MF_BYCOMMAND | (m_sortby == SortByAlgorithm ? MF_CHECKED : MF_UNCHECKED) );
-    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_HASH, MF_BYCOMMAND | (m_sortby == SortByHash ? MF_CHECKED : MF_UNCHECKED) );
+    ::CheckMenuItem( hSubMenu, IDC_MENU_UNSORTED, MF_BYCOMMAND | (m_sortBy == Unsorted ? MF_CHECKED : MF_UNCHECKED) );
+    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_FILE, MF_BYCOMMAND | (m_sortBy == SortByFile ? MF_CHECKED : MF_UNCHECKED) );
+    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_ALGORITHM, MF_BYCOMMAND | (m_sortBy == SortByAlgorithm ? MF_CHECKED : MF_UNCHECKED) );
+    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_HASH, MF_BYCOMMAND | (m_sortBy == SortByHash ? MF_CHECKED : MF_UNCHECKED) );
+
+    ::CheckMenuItem(hSubMenu, IDC_MENU_ALWAYS_ON_TOP, MF_BYCOMMAND | (m_alwaysOnTop ? MF_CHECKED : MF_UNCHECKED) );
 
     ::TrackPopupMenu( hSubMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON, x, y, 0, m_hWnd, NULL );
 }
@@ -1106,12 +1115,6 @@ void CyoHashDlg2::HashThread( ThreadData* data )
     CStringW algorithm = hashData.algorithm;
     algorithm.MakeUpper();
 
-    bool extraAlgorithms = false;
-    if (   ::IsWindowsVistaOrGreater()
-        || ::IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WS03), LOBYTE(_WIN32_WINNT_WS03), 0) //2003 or XP64
-        || ::IsWindowsXPSP3OrGreater())
-        extraAlgorithms = true;
-
     std::auto_ptr< IHasher > hasher;
     if (algorithm == _T("MD5"))
         hasher = std::auto_ptr< IHasher >( new MD5Hasher );
@@ -1119,11 +1122,11 @@ void CyoHashDlg2::HashThread( ThreadData* data )
         hasher = std::auto_ptr< IHasher >( new SHAHasher( sha1hash, true ));
     else if (algorithm == _T("SHA1-BASE32"))
         hasher = std::auto_ptr< IHasher >( new SHAHasher( sha1hash, false ));
-    else if (algorithm == _T("SHA256") && extraAlgorithms)
+    else if (algorithm == _T("SHA256"))
         hasher = std::auto_ptr< IHasher >( new SHAHasher( sha256hash, true ));
-    else if (algorithm == _T("SHA384") && extraAlgorithms)
+    else if (algorithm == _T("SHA384"))
         hasher = std::auto_ptr< IHasher >( new SHAHasher( sha384hash, true ));
-    else if (algorithm == _T("SHA512") && extraAlgorithms)
+    else if (algorithm == _T("SHA512"))
         hasher = std::auto_ptr< IHasher >( new SHAHasher( sha512hash, true ));
     else if (algorithm == _T("CRC32"))
         hasher = std::auto_ptr< IHasher >( new CRC32Hasher );

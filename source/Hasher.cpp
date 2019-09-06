@@ -143,13 +143,9 @@ const LPCTSTR SHAHasher::GetName() const
 
 void SHAHasher::Init()
 {
-    LPCWSTR provider = MS_ENH_RSA_AES_PROV;
-    if (::IsWindowsXPOrGreater())
-        provider = L"Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)";
-
-    if (   !::CryptAcquireContext( &m_hProv, NULL, provider, PROV_RSA_AES, CRYPT_VERIFYCONTEXT )
-        && !::CryptAcquireContext( &m_hProv, NULL, MS_DEF_PROV, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT ))
-        throw std::runtime_error( "Unable to initialise crypto provider" );
+    if (!::CryptAcquireContext(&m_hProv, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)
+        && !::CryptAcquireContext(&m_hProv, NULL, MS_DEF_PROV, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
+        throw std::runtime_error("Unable to initialise crypto provider");
 
     ALG_ID algId;
     switch (m_alg)

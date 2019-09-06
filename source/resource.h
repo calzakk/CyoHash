@@ -40,6 +40,7 @@
 #define IDC_MENU_SORTBY_FILE            2018
 #define IDC_MENU_SORTBY_ALGORITHM       2019
 #define IDC_MENU_SORTBY_HASH            2020
+#define IDC_MENU_ALWAYS_ON_TOP          2021
 
 // Next default values for new objects
 // 

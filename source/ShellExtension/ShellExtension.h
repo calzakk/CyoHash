@@ -75,7 +75,6 @@ private:
     stringlist m_files;
     HMENU m_hSubMenu;
     UINT m_uidFirstCmd;
-    bool m_extraAlgorithms;
 
     // Implementation
     void StoreLastAlgorithm(std::wstring algorithm) const;

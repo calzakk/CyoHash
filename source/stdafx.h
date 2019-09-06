@@ -68,8 +68,6 @@ using namespace ATL;
 #include <shellapi.h>
 #include <wincrypt.h>
 
-#include <VersionHelpers.h>
-
 #pragma warning(disable : 4091) //prevents warning C4091: 'typedef ': ignored on left of 'tagGPFIDL_FLAGS' when no variable is declared
 #include <shlobj.h>
 

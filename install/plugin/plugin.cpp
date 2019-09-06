@@ -288,7 +288,7 @@ PLUGINFUNCTIONEND
 
 PLUGINFUNCTION( ValidatePlatform )
 {
-    if (::IsWindowsXPOrGreater())
+    if (::IsWindows7OrGreater())
         pushstring( "1" );
     else
         pushstring( "0" );

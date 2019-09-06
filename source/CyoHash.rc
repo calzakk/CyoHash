@@ -213,8 +213,10 @@ BEGIN
             MENUITEM "&Algorithm"               IDC_MENU_SORTBY_ALGORITHM
             MENUITEM "&Hash"                    IDC_MENU_SORTBY_HASH
         END
-        MENUITEM SEPARATOR
-        MENUITEM "&About CyoHash...",           IDC_MENU_ABOUT
+    MENUITEM SEPARATOR
+    MENUITEM "Always on &top",                  IDC_MENU_ALWAYS_ON_TOP
+    MENUITEM SEPARATOR
+    MENUITEM "&About CyoHash...",               IDC_MENU_ABOUT
     END
     POPUP "Resume"
     BEGIN
@@ -231,6 +233,8 @@ BEGIN
             MENUITEM "&Algorithm"               IDC_MENU_SORTBY_ALGORITHM
             MENUITEM "&Hash"                    IDC_MENU_SORTBY_HASH
         END
+        MENUITEM SEPARATOR
+        MENUITEM "Always on &top",              IDC_MENU_ALWAYS_ON_TOP
         MENUITEM SEPARATOR
         MENUITEM "&About CyoHash...",           IDC_MENU_ABOUT
     END
@@ -251,6 +255,8 @@ BEGIN
             MENUITEM "&Hash"                    IDC_MENU_SORTBY_HASH
         END
         MENUITEM SEPARATOR
+        MENUITEM "Always on &top",              IDC_MENU_ALWAYS_ON_TOP
+        MENUITEM SEPARATOR
         MENUITEM "&About CyoHash...",           IDC_MENU_ABOUT
     END
     POPUP "Completed"
@@ -270,6 +276,8 @@ BEGIN
             MENUITEM "&Hash"                    IDC_MENU_SORTBY_HASH
         END
         MENUITEM SEPARATOR
+        MENUITEM "Always on &top",              IDC_MENU_ALWAYS_ON_TOP
+        MENUITEM SEPARATOR
         MENUITEM "&About CyoHash...",           IDC_MENU_ABOUT
     END
     POPUP "Cancelled"
@@ -288,6 +296,8 @@ BEGIN
             MENUITEM "&Hash"                    IDC_MENU_SORTBY_HASH
         END
         MENUITEM SEPARATOR
+        MENUITEM "Always on &top",              IDC_MENU_ALWAYS_ON_TOP
+        MENUITEM SEPARATOR
         MENUITEM "&About CyoHash...",           IDC_MENU_ABOUT
     END
     POPUP "List"
@@ -303,14 +313,9 @@ BEGIN
             MENUITEM "&Hash"                    IDC_MENU_SORTBY_HASH
         END
         MENUITEM SEPARATOR
+        MENUITEM "Always on &top",              IDC_MENU_ALWAYS_ON_TOP
+        MENUITEM SEPARATOR
         MENUITEM "&About CyoHash...",           IDC_MENU_ABOUT
-    END
-    POPUP "Hashes"
-    BEGIN
-        MENUITEM "&MD5",                        IDC_MENU_MD5
-        MENUITEM "&SHA1",                       IDC_MENU_SHA1
-        MENUITEM "SHA1(&base32)",               IDC_MENU_SHA1BASE32
-        MENUITEM "&CRC32",                      IDC_MENU_CRC32
     END
     POPUP "AllHashes"
     BEGIN
