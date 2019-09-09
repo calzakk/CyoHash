@@ -969,6 +969,11 @@ void CyoHashDlg2::OnMessageReceived( LPBYTE start, DWORD length )
     CStringW pathname = begin;
     CStringW algorithm = (pos + 1);
 
+    ShowWindow( SW_RESTORE );
+    SetWindowPos(HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    if (!m_alwaysOnTop)
+        SetWindowPos(HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
     BeginHashing( pathname, algorithm );
 }
 
