@@ -35,8 +35,8 @@ SetCompressor /SOLID /FINAL LZMA
 Name "CyoHash"
 OutFile "CyoHash.exe"
 
-!define PRODUCT_VERSION 2.3.0
-!define FILE_VERSION    2.3.0.0
+!define PRODUCT_VERSION 2.4.0
+!define FILE_VERSION    2.4.0.0
 
 VIProductVersion "${FILE_VERSION}"
 VIAddVersionKey "FileVersion" "${FILE_VERSION}"

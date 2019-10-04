@@ -41,13 +41,14 @@
 #define IDC_MENU_SORTBY_ALGORITHM       2019
 #define IDC_MENU_SORTBY_HASH            2020
 #define IDC_MENU_ALWAYS_ON_TOP          2021
+#define IDC_MENU_EXPORTHASHES           2022
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        109
-#define _APS_NEXT_COMMAND_VALUE         2021
+#define _APS_NEXT_COMMAND_VALUE         2023
 #define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

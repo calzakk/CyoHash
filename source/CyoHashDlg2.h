@@ -70,6 +70,7 @@ BEGIN_MSG_MAP( CyoHashDlg2 )
     COMMAND_HANDLER( IDC_MENU_CLEAR, BN_CLICKED, OnMenuClear )
     COMMAND_HANDLER( IDC_MENU_CLEARALL, BN_CLICKED, OnMenuClearAll )
     COMMAND_HANDLER( IDC_MENU_HASHFILE, BN_CLICKED, OnMenuHashFile )
+    COMMAND_HANDLER( IDC_MENU_EXPORTHASHES, BN_CLICKED, OnMenuExportHashes )
     COMMAND_HANDLER( IDC_MENU_ALWAYS_ON_TOP, BN_CLICKED, OnMenuAlwaysOnTop )
     COMMAND_HANDLER( IDC_MENU_ABOUT, BN_CLICKED, OnMenuAbout )
     COMMAND_HANDLER( IDC_MENU_MD5, BN_CLICKED, OnMenuMD5 )
@@ -111,6 +112,7 @@ END_MSG_MAP()
     LRESULT OnMenuClear( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuClearAll( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuHashFile( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
+    LRESULT OnMenuExportHashes( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuAlwaysOnTop( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuAbout( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
     LRESULT OnMenuMD5( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled );
@@ -155,12 +157,18 @@ private:
     };
     typedef CAtlMap<int, HashData> HashMap;
     typedef std::vector<int> IntVector;
-    enum SortBy
+    enum class SortBy
     {
         Unsorted,
         SortByFile,
         SortByAlgorithm,
         SortByHash
+    };
+    enum class ExportFormat
+    {
+        Json,
+        Csv,
+        Txt
     };
 
     // Data
@@ -175,7 +183,7 @@ private:
     CStringW m_pathname;
     CStringW m_algorithm;
     int m_nextKey;
-    ATL::CComCriticalSection m_sync;
+    CComCriticalSection m_sync;
     HashMap m_hashData;
     CWindow m_listWnd;
     CAtlList<CStringW> m_droppedFiles;
@@ -193,6 +201,8 @@ private:
     int FindItem( int key );
     void ClearSelectedItems();
     IntVector GetSelectedItems();
+    IntVector GetAllItems();
+    IntVector GetItems(DWORD flags);
     void ShowPopupMenu( int x, int y );
     void HashDroppedFiles( LPCWSTR algorithm );
     static DWORD WINAPI StaticPipeThread( LPVOID param );
@@ -206,6 +216,11 @@ private:
     int CompareFunc( LPARAM lParam1, LPARAM lParam2 );
     static DWORD WINAPI StaticHashThread( LPVOID param );
     void HashThread( ThreadData* data );
+    bool SaveFileDialog(CStringW& pathname) const;
+    void GetHashesForExport(CAtlList<CStringW>& hashes, ExportFormat exportFormat);
+    void ExportHashesJson(std::wofstream& file, const CAtlList<CStringW>& hashes) const;
+    void ExportHashesCsv(std::wofstream& file, const CAtlList<CStringW>& hashes) const;
+    void ExportHashesTxt(std::wofstream& file, const CAtlList<CStringW>& hashes) const;
 
     // Thread-safe functions
     int SafeCreateHashData( LPCWSTR pathname, LPCWSTR algorithm );

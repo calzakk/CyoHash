@@ -1,4 +1,4 @@
----CyoHash 2.3.0
+---CyoHash 2.4.0
 
 Thank you for downloading CyoHash!
 

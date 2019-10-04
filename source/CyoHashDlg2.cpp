@@ -84,7 +84,7 @@ CyoHashDlg2::CyoHashDlg2( LPCWSTR pipeName, HANDLE dialogReadyEvent, LPCWSTR pat
     m_pathname( pathname ),
     m_algorithm( algorithm ),
     m_nextKey( 0 ),
-    m_sortBy( Unsorted ),
+    m_sortBy( SortBy::Unsorted ),
     m_alwaysOnTop( true )
 {
     m_sync.Init();
@@ -309,7 +309,7 @@ int CyoHashDlg2::CompareFunc(LPARAM lParam1, LPARAM lParam2)
     int key1 = (int)lParam1;
     int key2 = (int)lParam2;
 
-    if (m_sortBy == Unsorted)
+    if (m_sortBy == SortBy::Unsorted)
     {
         if (key1 < key2)
             return -1;
@@ -324,9 +324,9 @@ int CyoHashDlg2::CompareFunc(LPARAM lParam1, LPARAM lParam2)
     int subitem;
     switch (m_sortBy)
     {
-    case SortByFile: subitem = 0; break;
-    case SortByAlgorithm: subitem = 1; break;
-    case SortByHash: subitem = 2; break;
+    case SortBy::SortByFile: subitem = 0; break;
+    case SortBy::SortByAlgorithm: subitem = 1; break;
+    case SortBy::SortByHash: subitem = 2; break;
     default: throw;
     }
     wchar_t szText1[ 256 ];
@@ -538,7 +538,7 @@ LRESULT CyoHashDlg2::OnMenuCopyHash( WORD wNotifyCode, WORD wID, HWND hWndCtl, B
 
     if (::OpenClipboard( NULL ) && ::EmptyClipboard())
     {
-        ATL::CStrBufW hash( hashData.hash );
+        CStrBufW hash( hashData.hash );
         size_t numChars = (wcslen( hash ) + 1);
         HGLOBAL hglb = ::GlobalAlloc( GMEM_MOVEABLE, numChars * sizeof( wchar_t ));
         if (hglb != NULL)
@@ -598,6 +598,38 @@ LRESULT CyoHashDlg2::OnMenuHashFile( WORD wNotifyCode, WORD wID, HWND hWndCtl, B
     BrowseDlg dlg( pathname, algorithm );
     if (dlg.DoModal() == IDOK)
         BeginHashing( pathname, algorithm );
+
+    bHandled = TRUE;
+    return 0;
+}
+
+LRESULT CyoHashDlg2::OnMenuExportHashes( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
+{
+    CStringW pathname;
+    if (SaveFileDialog(pathname))
+    {
+        LPCWSTR extension = ::PathFindExtensionW(pathname);
+        ExportFormat exportFormat = ExportFormat::Txt;
+        if (_wcsicmp(extension, L".json") == 0)
+            exportFormat = ExportFormat::Json;
+        else if (_wcsicmp(extension, L".csv") == 0)
+            exportFormat = ExportFormat::Csv;
+
+        CAtlList<CStringW> list;
+        GetHashesForExport(list, exportFormat);
+
+        std::wofstream file(pathname);
+        switch (exportFormat)
+        {
+        case ExportFormat::Json: ExportHashesJson(file, list); break;
+        case ExportFormat::Csv: ExportHashesCsv(file, list); break;
+        default: ExportHashesTxt(file, list);
+        }
+
+        std::wostringstream msg;
+        msg << L"Exported to:\n\n" << (LPCWSTR)pathname;
+        ::MessageBoxW(m_hWnd, msg.str().c_str(), L"CyoHash - Export", MB_OK | MB_ICONINFORMATION);
+    }
 
     bHandled = TRUE;
     return 0;
@@ -679,7 +711,7 @@ LRESULT CyoHashDlg2::OnMenuCRC32( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL
 
 LRESULT CyoHashDlg2::OnMenuUnsorted( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
-    m_sortBy = Unsorted;
+    m_sortBy = SortBy::Unsorted;
     SortList();
 
     bHandled = TRUE;
@@ -688,7 +720,7 @@ LRESULT CyoHashDlg2::OnMenuUnsorted( WORD wNotifyCode, WORD wID, HWND hWndCtl, B
 
 LRESULT CyoHashDlg2::OnMenuSortByFile( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
-    m_sortBy = SortByFile;
+    m_sortBy = SortBy::SortByFile;
     SortList();
 
     bHandled = TRUE;
@@ -697,7 +729,7 @@ LRESULT CyoHashDlg2::OnMenuSortByFile( WORD wNotifyCode, WORD wID, HWND hWndCtl,
 
 LRESULT CyoHashDlg2::OnMenuSortByAlgorithm( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
-    m_sortBy = SortByAlgorithm;
+    m_sortBy = SortBy::SortByAlgorithm;
     SortList();
 
     bHandled = TRUE;
@@ -706,7 +738,7 @@ LRESULT CyoHashDlg2::OnMenuSortByAlgorithm( WORD wNotifyCode, WORD wID, HWND hWn
 
 LRESULT CyoHashDlg2::OnMenuSortByHash( WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled )
 {
-    m_sortBy = SortByHash;
+    m_sortBy = SortBy::SortByHash;
     SortList();
 
     bHandled = TRUE;
@@ -727,7 +759,7 @@ void CyoHashDlg2::ReadLastSettings()
     m_lastWidth = ReadIntFromRegistry( hKey, L"cx", -1 );
     m_lastHeight  = ReadIntFromRegistry( hKey, L"cy", -1 );
 
-    m_sortBy = (SortBy)ReadIntFromRegistry( hKey, L"sortBy", (int)Unsorted );
+    m_sortBy = (SortBy)ReadIntFromRegistry( hKey, L"sortBy", (int)SortBy::Unsorted );
 
     m_alwaysOnTop = ReadIntFromRegistry( hKey, L"alwaysOnTop", 0 ) != 0;
 
@@ -861,15 +893,25 @@ void CyoHashDlg2::ClearSelectedItems()
 
 CyoHashDlg2::IntVector CyoHashDlg2::GetSelectedItems()
 {
+    return GetItems(LVNI_SELECTED);
+}
+
+CyoHashDlg2::IntVector CyoHashDlg2::GetAllItems()
+{
+    return GetItems(LVNI_ALL);
+}
+
+CyoHashDlg2::IntVector CyoHashDlg2::GetItems(DWORD flags)
+{
     IntVector items;
 
     int item = -1;
     while (true)
     {
-        item = ListView_GetNextItem( m_listWnd, item, LVNI_SELECTED );
+        item = ListView_GetNextItem(m_listWnd, item, flags);
         if (item == -1)
             break;
-        items.push_back( item );
+        items.push_back(item);
     }
 
     return items;
@@ -877,7 +919,7 @@ CyoHashDlg2::IntVector CyoHashDlg2::GetSelectedItems()
 
 void CyoHashDlg2::ShowPopupMenu( int x, int y )
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
     int submenu = SUBMENU_LIST;
 
@@ -914,10 +956,10 @@ void CyoHashDlg2::ShowPopupMenu( int x, int y )
     HMENU hSubMenu = ::GetSubMenu( m_hMenu, submenu );
     ATLASSERT( hSubMenu != NULL );
 
-    ::CheckMenuItem( hSubMenu, IDC_MENU_UNSORTED, MF_BYCOMMAND | (m_sortBy == Unsorted ? MF_CHECKED : MF_UNCHECKED) );
-    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_FILE, MF_BYCOMMAND | (m_sortBy == SortByFile ? MF_CHECKED : MF_UNCHECKED) );
-    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_ALGORITHM, MF_BYCOMMAND | (m_sortBy == SortByAlgorithm ? MF_CHECKED : MF_UNCHECKED) );
-    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_HASH, MF_BYCOMMAND | (m_sortBy == SortByHash ? MF_CHECKED : MF_UNCHECKED) );
+    ::CheckMenuItem( hSubMenu, IDC_MENU_UNSORTED, MF_BYCOMMAND | (m_sortBy == SortBy::Unsorted ? MF_CHECKED : MF_UNCHECKED) );
+    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_FILE, MF_BYCOMMAND | (m_sortBy == SortBy::SortByFile ? MF_CHECKED : MF_UNCHECKED) );
+    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_ALGORITHM, MF_BYCOMMAND | (m_sortBy == SortBy::SortByAlgorithm ? MF_CHECKED : MF_UNCHECKED) );
+    ::CheckMenuItem( hSubMenu, IDC_MENU_SORTBY_HASH, MF_BYCOMMAND | (m_sortBy == SortBy::SortByHash ? MF_CHECKED : MF_UNCHECKED) );
 
     ::CheckMenuItem(hSubMenu, IDC_MENU_ALWAYS_ON_TOP, MF_BYCOMMAND | (m_alwaysOnTop ? MF_CHECKED : MF_UNCHECKED) );
 
@@ -1249,12 +1291,137 @@ void CyoHashDlg2::HashThread( ThreadData* data )
     }
 }
 
+bool CyoHashDlg2::SaveFileDialog(CStringW& pathname) const
+{
+    CComPtr<IFileDialog> fileDialog;
+    if (FAILED(fileDialog.CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_INPROC_SERVER)))
+        return false;
+
+    COMDLG_FILTERSPEC fileTypes[] =
+    {
+        { L"JSON files", L"*.json" },
+        { L"CSV files", L"*.csv" },
+        { L"Text files", L"*.txt" },
+        { L"All files", L"*.*" }
+    };
+    if (FAILED(fileDialog->SetFileTypes(ARRAYSIZE(fileTypes), fileTypes)))
+        return false;
+
+    if (FAILED(fileDialog->SetFileTypeIndex(0)))
+        return false;
+
+    if (FAILED(fileDialog->SetDefaultExtension(L"json")))
+        return false;
+
+    if (FAILED(fileDialog->Show(NULL)))
+        return false;
+
+    HRESULT hres;
+    CComPtr<IShellItem> shellItem;
+    hres = fileDialog->GetResult(&shellItem);
+    if (FAILED(hres))
+    {
+        wchar_t msg[1024];
+        ::swprintf_s(msg, L"GetResult failed, hres=%0x", hres);
+        ::MessageBoxW(m_hWnd, msg, L"CyoHash - Export", MB_OK | MB_ICONINFORMATION);
+        return false;
+    }
+
+    PWSTR pszFilePath = NULL;
+    hres = shellItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+    if (FAILED(hres))
+    {
+        wchar_t msg[1024];
+        ::swprintf_s(msg, L"GetDisplayName failed, hres=%0x", hres);
+        ::MessageBoxW(m_hWnd, msg, L"CyoHash - Export", MB_OK | MB_ICONINFORMATION);
+        return false;
+    }
+
+    pathname = pszFilePath;
+    ::CoTaskMemFree(pszFilePath);
+    return true;
+}
+
+void CyoHashDlg2::GetHashesForExport(CAtlList<CStringW>& list, ExportFormat exportFormat)
+{
+    CComCritSecLock<CComCriticalSection> lock(m_sync);
+
+    IntVector items = GetAllItems();
+    for (IntVector::const_iterator i = items.begin(); i != items.end(); ++i)
+    {
+        int key = GetItemKey(*i);
+        HashData hashData = SafeGetHashData(key);
+        if (!hashData.completed)
+            continue;
+
+        std::wostringstream msg;
+        switch (exportFormat)
+        {
+        case ExportFormat::Json:
+        {
+            CStringW pathname = hashData.pathname;
+            pathname.Replace(L"\\", L"\\\\");
+            const wchar_t* const indent = L"    ";
+            msg << indent << L"{\n";
+            msg << indent << indent << L"\"file\": \"" << (LPCWSTR)pathname << L"\",\n";
+            msg << indent << indent << L"\"algorithm\": \"" << (LPCWSTR)hashData.algorithm << L"\",\n";
+            msg << indent << indent << L"\"hash\": \"" << (LPCWSTR)hashData.hash << L"\"\n";
+            msg << indent << L"}";
+            break;
+        }
+        case ExportFormat::Csv:
+            msg << L"\"" << (LPCWSTR)hashData.pathname << L"\""
+                << L"," << (LPCWSTR)hashData.algorithm
+                << L"," << (LPCWSTR)hashData.hash;
+            break;
+
+        default: //TXT
+            msg << (LPCWSTR)hashData.hash
+                << L"  " << (LPCWSTR)hashData.pathname
+                << L"  " << (LPCWSTR)hashData.algorithm;
+            break;
+        }
+        list.AddTail(msg.str().c_str());
+    }
+}
+
+void CyoHashDlg2::ExportHashesJson(std::wofstream& file, const CAtlList<CStringW>& list) const
+{
+    file << L"[\n";
+
+    bool first = true;
+    for (POSITION pos = list.GetHeadPosition(); pos != NULL; )
+    {
+        if (first)
+            first = false;
+        else
+            file << L",\n";
+
+        file << (LPCWSTR)list.GetNext(pos);
+    }
+
+    file << L"\n]\n";
+}
+
+void CyoHashDlg2::ExportHashesCsv(std::wofstream& file, const CAtlList<CStringW>& list) const
+{
+    file << L"File,Algorithm,Hash\n";
+    for (POSITION pos = list.GetHeadPosition(); pos != NULL; )
+        file << (LPCWSTR)list.GetNext(pos) << "\n";
+}
+
+void CyoHashDlg2::ExportHashesTxt(std::wofstream& file, const CAtlList<CStringW>& list) const
+{
+    for (POSITION pos = list.GetHeadPosition(); pos != NULL; )
+        file << (LPCWSTR)list.GetNext(pos) << "\n";
+}
+
 //////////////////////////////////////////////////////////////////////
 // Thread-safe functions
 
 int CyoHashDlg2::SafeCreateHashData( LPCWSTR pathname, LPCWSTR algorithm )
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
     HashData& hashData = m_hashData[ m_nextKey ];
     hashData.pathname = pathname;
@@ -1271,31 +1438,31 @@ int CyoHashDlg2::SafeCreateHashData( LPCWSTR pathname, LPCWSTR algorithm )
 
 void CyoHashDlg2::SafeSetThreadHandle( int key, HANDLE thread )
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
     m_hashData[ key ].thread = thread;
 }
 
 CyoHashDlg2::HashData CyoHashDlg2::SafeGetHashData( int key )
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
     return m_hashData[ key ];
 }
 
 void CyoHashDlg2::SafeSetPaused( int key, bool paused )
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
     m_hashData[ key ].paused = paused;
 }
 
 void CyoHashDlg2::SafeSetCompleted( int key, IHasher* hasher )
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
-    ATL::CA2W hash( hasher->GetHash() );
-    ATL::CT2W name( hasher->GetName() );
+    CA2W hash( hasher->GetHash() );
+    CT2W name( hasher->GetName() );
     HashData& hashData = m_hashData[ key ];
     hashData.hash = hash;
     hashData.algorithmLong = name;
@@ -1307,14 +1474,14 @@ void CyoHashDlg2::SafeSetCompleted( int key, IHasher* hasher )
 
 void CyoHashDlg2::SafeSetCancelled( int key )
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
     m_hashData[ key ].cancelled = true;
 }
 
 void CyoHashDlg2::SafeClearAll()
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
     for (POSITION pos = m_hashData.GetStartPosition(); pos != NULL; )
     {
@@ -1333,7 +1500,7 @@ void CyoHashDlg2::SafeClearAll()
 
 void CyoHashDlg2::SafeJoinAll()
 {
-    ATL::CComCritSecLock<ATL::CComCriticalSection> lock( m_sync );
+    CComCritSecLock<CComCriticalSection> lock( m_sync );
 
     for (POSITION pos = m_hashData.GetStartPosition(); pos != NULL; )
     {

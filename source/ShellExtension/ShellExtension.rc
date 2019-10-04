@@ -53,8 +53,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,3,0,0
- PRODUCTVERSION 2,3,0,0
+ FILEVERSION 2,4,0,0
+ PRODUCTVERSION 2,4,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
         BLOCK "080904b0"
         BEGIN
             VALUE "FileDescription", "CyoHash Shell Extension"
-            VALUE "FileVersion", "2.3.0.0"
+            VALUE "FileVersion", "2.4.0.0"
             VALUE "InternalName", "CyoHash.dll"
             VALUE "LegalCopyright", "Copyright (c) Graham Bull. All rights reserved."
             VALUE "OriginalFilename", "CyoHash.dll"
             VALUE "ProductName", "CyoHash"
-            VALUE "ProductVersion", "2.3.0"
+            VALUE "ProductVersion", "2.4.0"
         END
     END
     BLOCK "VarFileInfo"

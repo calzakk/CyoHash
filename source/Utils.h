@@ -29,6 +29,12 @@
 
 namespace utils
 {
+    struct ComInit
+    {
+        ComInit() { ::CoInitialize(NULL); }
+        ~ComInit() { ::CoUninitialize(); }
+    };
+
     struct AutoCloseHandle
     {
         AutoCloseHandle( HANDLE handle ) : m_handle( handle ) { }

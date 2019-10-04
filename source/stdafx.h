@@ -72,6 +72,7 @@ using namespace ATL;
 #include <shlobj.h>
 
 #include <cassert>
+#include <fstream>
 #include <memory>
 #include <sstream>
 #include <stdexcept>

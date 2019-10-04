@@ -5,8 +5,8 @@ https://github.com/calzakk/CyoHash
 Copyright (c) Graham Bull. All rights reserved.
 ===============================================================================
 
-Version 2.3.0.0
-Release Date 15th February 2017
+Version 2.4.0.0
+Release Date 6th October 2019
 
 -------------------------------------------------------------------------------
 1. License
@@ -48,6 +48,10 @@ a hash function from the CyoHash context menu.
 -------------------------------------------------------------------------------
 4. Release Notes
 -------------------------------------------------------------------------------
+
+2.4.0 - 6th October 2019
+- Added new 'Always on top' menu item.
+- Ability to export all hashes to a file (JSON, CSV, or text).
 
 2.3.0 - 15th February 2017
 - Ability to hash all files in a folder.

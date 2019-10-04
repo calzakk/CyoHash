@@ -30,6 +30,7 @@
 #include "BrowseDlg.h"
 #include "CyoHashDlg2.h"
 #include "Hasher.h"
+#include "Utils.h"
 
 //////////////////////////////////////////////////////////////////////
 
@@ -37,6 +38,8 @@ int APIENTRY _tWinMain( HINSTANCE, HINSTANCE, LPTSTR, int )
 {
     try
     {
+        utils::ComInit comInit;
+
         CStringW strPathname = L"";
         CStringW strAlgorithm = L"";
 
