@@ -4,7 +4,7 @@ CyoHash is a simple shell extension that is used from within Windows Explorer to
 
 ## Building
 
-CyoHash in built using Microsoft Visual Studio 2015 (but will probably also build with an earlier version). The installer is built using NSIS (http://nsis.sourceforge.net/Download).
+CyoHash in built using Microsoft Visual Studio 2017 (but will probably also build with an earlier version). The installer is built using NSIS (http://nsis.sourceforge.net/Download).
 
 ### 1. Build the solution
 
